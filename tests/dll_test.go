@@ -13,7 +13,7 @@ func TestAdd(t *testing.T) {
 		numbers.Add(23)
 
 		assert.Equal(t, 1, numbers.Length())
-		assert.Equal(t, numbers.Start(), numbers.End())
+		assert.Equal(t, numbers.GetFirst(), numbers.GetLast())
 	})
 
 	t.Run("add 3 numbers", func(t *testing.T) {
@@ -23,8 +23,8 @@ func TestAdd(t *testing.T) {
 		numbers.Add(37)
 
 		assert.Equal(t, 3, numbers.Length())
-		assert.Equal(t, 23, numbers.Start().GetValue())
-		assert.Equal(t, 37, numbers.End().GetValue())
+		assert.Equal(t, 23, numbers.GetFirst().GetValue())
+		assert.Equal(t, 37, numbers.GetLast().GetValue())
 
 	})
 
@@ -52,6 +52,29 @@ func TestAdd(t *testing.T) {
 
 		numbers.Add(5)
 		numbers.Replace(0, 2)
-		assert.Equal(t, 2, numbers.Start().GetValue())
+		assert.Equal(t, 2, numbers.GetFirst().GetValue())
+	})
+
+	t.Run("insert after", func(t *testing.T) {
+		numbers := dll.NewDLL[int]()
+
+		element := numbers.Add(5)
+		numbers.Add(7)
+
+		numbers.InsertAfter(element, 6)
+		assert.Equal(t, 3, numbers.Length())
+		assert.Equal(t, 6, numbers.GetIndex(1).GetValue())
+	})
+
+	t.Run("insert before", func(t *testing.T) {
+		numbers := dll.NewDLL[int]()
+
+		element := numbers.Add(5)
+		numbers.Add(6)
+
+		numbers.InsertBefore(element, 4)
+
+		assert.Equal(t, 3, numbers.Length())
+		assert.Equal(t, 4, numbers.GetFirst().GetValue())
 	})
 }

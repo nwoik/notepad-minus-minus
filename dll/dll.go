@@ -2,33 +2,34 @@ package dll
 
 type DoubleLinkedList[T any] struct {
 	length int
-	start  *ListElement[T]
-	end    *ListElement[T]
+	first  *ListElement[T]
+	last   *ListElement[T]
 }
 
 func NewDLL[T any]() *DoubleLinkedList[T] {
 	return &DoubleLinkedList[T]{
 		length: 0,
-		start:  nil,
-		end:    nil,
+		first:  nil,
+		last:   nil,
 	}
 }
 
-func (dll *DoubleLinkedList[T]) Add(value T) {
+func (dll *DoubleLinkedList[T]) Add(value T) *ListElement[T] {
 	element := NewDLLElement(value)
-	if dll.end == nil {
-		dll.start = element
-		dll.end = element
+	if dll.last == nil {
+		dll.first = element
+		dll.last = element
 	} else {
-		end := dll.end
+		end := dll.last
 
 		end.next = element
 		element.prev = end
 
-		dll.end = element
+		dll.last = element
 	}
 
 	dll.length += 1
+	return element
 }
 
 func (dll *DoubleLinkedList[T]) AddAll(values ...T) {
@@ -37,7 +38,7 @@ func (dll *DoubleLinkedList[T]) AddAll(values ...T) {
 	}
 }
 
-func (dll *DoubleLinkedList[T]) Insert(selectedElement *ListElement[T], value T) {
+func (dll *DoubleLinkedList[T]) InsertAfter(selectedElement *ListElement[T], value T) {
 	element := NewDLLElement(value)
 	next := selectedElement.next
 
@@ -49,12 +50,39 @@ func (dll *DoubleLinkedList[T]) Insert(selectedElement *ListElement[T], value T)
 	element.prev = selectedElement
 	selectedElement.next = element
 
+	if selectedElement == dll.last {
+		dll.last = element
+	}
 	dll.length += 1
 }
 
-func (dll *DoubleLinkedList[T]) InsertAtIndex(index int, value T) {
+func (dll *DoubleLinkedList[T]) InsertBefore(selectedElement *ListElement[T], value T) {
+	element := NewDLLElement(value)
+	prev := selectedElement.prev
+
+	if prev != nil {
+		prev.next = element
+		element.prev = prev
+	}
+
+	element.next = selectedElement
+	selectedElement.prev = element
+
+	if selectedElement == dll.first {
+		dll.first = element
+	}
+
+	dll.length += 1
+}
+
+func (dll *DoubleLinkedList[T]) InsertAfterIndex(index int, value T) {
 	element := dll.GetIndex(index)
-	dll.Insert(element, value)
+	dll.InsertAfter(element, value)
+}
+
+func (dll *DoubleLinkedList[T]) InsertBeforeIndex(index int, value T) {
+	element := dll.GetIndex(index)
+	dll.InsertBefore(element, value)
 }
 
 func (dll *DoubleLinkedList[T]) Replace(index int, value T) {
@@ -64,11 +92,11 @@ func (dll *DoubleLinkedList[T]) Replace(index int, value T) {
 
 func (dll *DoubleLinkedList[T]) GetIndex(index int) *ListElement[T] {
 	if index >= dll.Length() {
-		return dll.end
+		return dll.last
 	}
 
 	count := 0
-	element := dll.Start()
+	element := dll.GetFirst()
 
 	for count < dll.Length() {
 		if count == index {
@@ -78,23 +106,23 @@ func (dll *DoubleLinkedList[T]) GetIndex(index int) *ListElement[T] {
 		count++
 	}
 
-	return dll.end
+	return dll.last
 }
 
 func (dll *DoubleLinkedList[T]) Length() int {
 	return dll.length
 }
 
-func (dll *DoubleLinkedList[T]) Start() *ListElement[T] {
-	return dll.start
+func (dll *DoubleLinkedList[T]) GetFirst() *ListElement[T] {
+	return dll.first
 }
 
-func (dll *DoubleLinkedList[T]) End() *ListElement[T] {
-	return dll.end
+func (dll *DoubleLinkedList[T]) GetLast() *ListElement[T] {
+	return dll.last
 }
 
 func (dll *DoubleLinkedList[T]) PrintElements() {
-	start := dll.start
+	start := dll.first
 	if start != nil {
 		println(start.PrintElement())
 	}
