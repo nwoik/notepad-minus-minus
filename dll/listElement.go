@@ -16,6 +16,14 @@ func NewDLLElement[T any](value T) *ListElement[T] {
 	}
 }
 
+func (element *ListElement[T]) GetValue() T {
+	return element.value
+}
+
+func (element *ListElement[T]) SetValue(value T) {
+	element.value = value
+}
+
 func (element *ListElement[T]) PrintElement() string {
 
 	next := element.next
