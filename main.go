@@ -22,26 +22,25 @@ func main() {
 	// }
 }
 
-func OpenFile(path string) (*dll.DoubleLinkedList[Line], error) {
+func OpenFile(path string) (*dll.DoubleLinkedList[*dll.DoubleLinkedList[Character]], error) {
 	file, err := os.Open(path)
 	if err != nil {
 		return nil, err
 	}
 
 	scanner := bufio.NewScanner(file)
-	text := dll.NewDLL[Line]()
+	text := dll.NewDLL[*dll.DoubleLinkedList[Character]]()
 
 	for scanner.Scan() {
 		scannerText := scanner.Text()
-		line := NewLine()
+		line := dll.NewDLL[Character]()
 		text.Add(line)
 		for _, char := range scannerText {
 			character := Character{Rune: char}
-			line.Characters.Add(character)
+			line.Add(character)
 		}
-		line.Characters.Insert(line.Characters.Start(), Character{Rune: 32345})
 
-		line.Characters.PrintElements()
+		line.PrintElements()
 	}
 
 	return text, nil

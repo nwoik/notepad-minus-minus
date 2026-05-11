@@ -52,6 +52,11 @@ func (dll *DoubleLinkedList[T]) Insert(selectedElement *ListElement[T], value T)
 	dll.length += 1
 }
 
+func (dll *DoubleLinkedList[T]) InsertAtIndex(index int, value T) {
+	element := dll.GetIndex(index)
+	dll.Insert(element, value)
+}
+
 func (dll *DoubleLinkedList[T]) Replace(index int, value T) {
 	element := dll.GetIndex(index)
 	element.SetValue(value)
