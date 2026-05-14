@@ -33,7 +33,7 @@ func OpenFile(path string) (*dll.DoubleLinkedList[*dll.DoubleLinkedList[Characte
 
 	for scanner.Scan() {
 		scannerText := scanner.Text()
-		line := dll.NewDLL[Character]()
+		line := NewLine()
 		text.Add(line)
 		for _, char := range scannerText {
 			character := Character{Rune: char}

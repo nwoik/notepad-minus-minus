@@ -14,6 +14,14 @@ func NewDLL[T any]() *DoubleLinkedList[T] {
 	}
 }
 
+func Of[T any](values ...T) *DoubleLinkedList[T] {
+	dll := NewDLL[T]()
+
+	dll.AddAll(values...)
+
+	return dll
+}
+
 func (dll *DoubleLinkedList[T]) Add(value T) *ListElement[T] {
 	element := NewDLLElement(value)
 	if dll.last == nil {
@@ -38,51 +46,108 @@ func (dll *DoubleLinkedList[T]) AddAll(values ...T) {
 	}
 }
 
-func (dll *DoubleLinkedList[T]) InsertAfter(selectedElement *ListElement[T], value T) {
-	element := NewDLLElement(value)
-	next := selectedElement.next
-
-	if next != nil {
-		next.prev = element
-		element.next = next
-	}
-
-	element.prev = selectedElement
-	selectedElement.next = element
+func (dll *DoubleLinkedList[T]) Insert(selectedElement *ListElement[T], value T) {
+	element := NewDLLElement(value) // {element}
 
 	if selectedElement == dll.last {
 		dll.last = element
+	} else {
+		next := selectedElement.next // {selected}-><-{next}
+
+		next.prev = element // {element}<-{next}
+		element.next = next // {element}->{next}
+		// {element}-><-{next}
 	}
+
+	element.prev = selectedElement // {selected}<-{element}
+	selectedElement.next = element // {selected}->{element}
+	// {selected}-><-{element}-><-{next}
+
 	dll.length += 1
+}
+
+func (dll *DoubleLinkedList[T]) InsertAll(selectedElement *ListElement[T], elements *DoubleLinkedList[T]) {
+	first := elements.first // {first}-><-...
+	last := elements.last   // ...-><-{last}
+
+	if selectedElement == dll.last {
+		dll.last = last
+	} else {
+		next := selectedElement.next // {selected}-><-{next}
+
+		next.prev = last // ...-><-{last}<-{next}
+		last.next = next // ...-><-{last}->{next}
+		// ...-><-{last}-><-{next}
+	}
+
+	first.prev = selectedElement // {selected}<-{first}-><-...
+	selectedElement.next = first // {selected}->{first}-><-...
+	// {selected}-><-{first}-><-...-><-{last}->{next}
+
+	dll.length += elements.length
 }
 
 func (dll *DoubleLinkedList[T]) InsertBefore(selectedElement *ListElement[T], value T) {
 	element := NewDLLElement(value)
-	prev := selectedElement.prev
-
-	if prev != nil {
-		prev.next = element
-		element.prev = prev
-	}
-
-	element.next = selectedElement
-	selectedElement.prev = element
 
 	if selectedElement == dll.first {
 		dll.first = element
+	} else {
+		prev := selectedElement.prev // {prev}-><-{selected}
+
+		prev.next = element // {prev}->{element}
+		element.prev = prev // {prev}<-{element}
+		// {prev}-><-{element}
 	}
+
+	element.next = selectedElement // {element}->{selected}
+	selectedElement.prev = element // {element}<-{selected}
+	// {prev}-><-{element}-><-{selected}
 
 	dll.length += 1
 }
 
-func (dll *DoubleLinkedList[T]) InsertAfterIndex(index int, value T) {
+func (dll *DoubleLinkedList[T]) InsertAllBefore(selectedElement *ListElement[T], elements *DoubleLinkedList[T]) {
+	first := elements.first // {first}-><-...
+	last := elements.last   // ...-><-{last}
+
+	if selectedElement == dll.first {
+		dll.first = first
+	} else {
+		prev := selectedElement.prev // {prev}-><-{selected}
+
+		prev.next = first // {prev}->{first}-><-...
+		first.prev = prev // {prev}<-{first}-><-...
+		// {prev}-><-{first}-><-...
+	}
+
+	last.next = selectedElement // ...-><-{last}->{selected}
+	selectedElement.prev = last // ...-><-{last}<-{selected}
+	// {prev}-><-{first}-><-...-><-{last}-><-{selected}
+
+	dll.length += elements.length
+}
+
+func (dll *DoubleLinkedList[T]) InsertAt(index int, value T) {
 	element := dll.GetIndex(index)
-	dll.InsertAfter(element, value)
+	dll.Insert(element, value)
+}
+
+func (dll *DoubleLinkedList[T]) InsertAllAt(index int, values ...T) {
+	element := dll.GetIndex(index)
+	elements := Of(values...)
+	dll.InsertAll(element, elements)
 }
 
 func (dll *DoubleLinkedList[T]) InsertBeforeIndex(index int, value T) {
 	element := dll.GetIndex(index)
 	dll.InsertBefore(element, value)
+}
+
+func (dll *DoubleLinkedList[T]) InsertAllBeforeIndex(index int, values ...T) {
+	element := dll.GetIndex(index)
+	elements := Of(values...)
+	dll.InsertAllBefore(element, elements)
 }
 
 func (dll *DoubleLinkedList[T]) Replace(index int, value T) {
